@@ -10,6 +10,10 @@ import { DashboardPage } from './pages/dashboard/DashboardPage';
 import OrdersPage from './pages/dashboard/OrdersPage';
 import CustomersPage from './pages/dashboard/CustomersPage';
 import AnalyticsPage from './pages/dashboard/AnalyticsPage';
+import AddOrder from './pages/dashboard/add-order';
+import ShipmentTracking from './pages/dashboard/shipment-tracking';
+import AddDriver from './pages/dashboard/add-driver';
+import AddVehicle from './pages/dashboard/add-vehicle';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -34,7 +38,6 @@ const PublicRoute = ({ children }) => {
     return <div>Loading...</div>;
   }
 
-  // Only redirect if we're on login or register pages
   if (user && (location.pathname === '/login' || location.pathname === '/register')) {
     const from = location.state?.from?.pathname || '/dashboard';
     return <Navigate to={from} replace />;
@@ -48,7 +51,6 @@ function AppRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Force navigation to home page if we're at the root
   useEffect(() => {
     if (location.pathname === '/') {
       console.log('Ensuring home page load');
@@ -70,7 +72,7 @@ function AppRoutes() {
           </PublicRoute>
         }
       />
-
+  
       {/* Auth Routes */}
       <Route
         path="/login"
@@ -88,7 +90,7 @@ function AppRoutes() {
           </PublicRoute>
         }
       />
-
+  
       {/* Dashboard Routes */}
       <Route
         path="/dashboard"
@@ -102,17 +104,18 @@ function AppRoutes() {
         <Route path="orders" element={<OrdersPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="add-order" element={<AddOrder />} />
+        <Route path="shipment-tracking" element={<ShipmentTracking />} />
+        <Route path="add-driver" element={<AddDriver />} />
+        <Route path="add-vehicle" element={<AddVehicle />} />
       </Route>
-
+         
       {/* Catch-all redirect */}
-      <Route
-        path="*"
-        element={<Navigate to="/" replace />}
-      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
-
+        
 function App() {
   return (
     <AuthProvider>
@@ -120,5 +123,5 @@ function App() {
     </AuthProvider>
   );
 }
-
+          
 export default App;
