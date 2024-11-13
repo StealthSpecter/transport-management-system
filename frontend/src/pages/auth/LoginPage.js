@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Alert } from '@/components/ui/alert';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -20,13 +21,36 @@ const LoginPage = () => {
    // setError('Invalid credentials. Please try again.');
  // }
 //};
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+//   setError(''); // Reset error before attempting login
+//   try {
+//     await login(formData); // Call mock login
+//   } catch (err) {
+//     setError(err.message); // Show error message if credentials are wrong
+//   }
+// };
+// Handle form submission
 const handleSubmit = async (e) => {
   e.preventDefault();
-  setError(''); // Reset error before attempting login
+  setError(''); // Clear previous errors
+
   try {
-    await login(formData); // Call mock login
+    // Send a POST request to the Django login API endpoint
+    const response = await axios.post('http://localhost:8000/login', formData);
+
+    // If the request is successful, save the user data to localStorage
+    localStorage.setItem('user', JSON.stringify(response.data));
+
+    // Redirect to the dashboard or home page upon successful login
+    navigate('/dashboard');
   } catch (err) {
-    setError(err.message); // Show error message if credentials are wrong
+    // Handle errors if the login fails
+    if (err.response && err.response.data) {
+      setError(err.response.data.error); // Show error from the Django API
+    } else {
+      setError('An error occurred. Please try again.');
+    }
   }
 };
 
