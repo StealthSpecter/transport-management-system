@@ -8,6 +8,9 @@ const AddVehicle = () => {
     capacity: '',
     status: 'available'
   });
+  
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,8 +22,10 @@ const AddVehicle = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     try {
-      const response = await axios.post('http://localhost:8000/api/vehicles/create/', vehicleData);
+      const response = await axios.post('http://localhost:8000/add-vehicle', vehicleData);
       alert('Vehicle added successfully!');
       // Reset form
       setVehicleData({
@@ -30,7 +35,11 @@ const AddVehicle = () => {
         status: 'available'
       });
     } catch (error) {
-      alert('Failed to add vehicle. Please try again.');
+      if (err.response && err.response.data) {
+        setError('Failed to add vehicle: ' + JSON.stringify(err.response.data));
+      } else {
+        setError('Error adding vehicle. Please try again.');
+      }
     }
   };
 
@@ -39,6 +48,8 @@ const AddVehicle = () => {
       <div className="bg-white rounded-lg shadow-md">
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-6">Add New Vehicle</h2>
+          {error && <div className="text-red-600 mb-4">{error}</div>}
+          {success && <div className="text-green-600 mb-4">{success}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Vehicle Number</label>
