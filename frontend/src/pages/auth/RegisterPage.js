@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import axios from 'axios';
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    cust_name: '',
+    cust_address: '',
+    cust_contact: '',
+    cust_email: '',
     password: '',
     confirmPassword: '',
   });
@@ -12,31 +16,43 @@ export const RegisterPage = () => {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
+    const payload = {
+      cust_name: formData.cust_name,
+      cust_address: formData.cust_address,
+      cust_contact: formData.cust_contact,
+      cust_email: formData.cust_email,
+      password: formData.password,
+    };
+
     try {
-      // Implement API call here for registration (e.g., POST to your register API endpoint)
-      // For now, we'll simulate a successful registration response
-      const mockResponse = { message: 'Registration successful', token: 'your_token_here' };
+      // Make an API request to register the user
+      const response = await axios.post('http://localhost:8000/register', payload);
 
-      if (mockResponse.token) {
-        // Save token to localStorage
-        localStorage.setItem('token', mockResponse.token);
-
-        // Set success message
-        setSuccess(mockResponse.message);
-
-        // Redirect to dashboard page after successful registration
+      if (response.status === 201) {
+        setSuccess('Registration successful!');
+        // Redirect to dashboard after a short delay
         setTimeout(() => navigate('/dashboard'), 2000);
       }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      if (err.response && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     }
   };
 
@@ -56,6 +72,42 @@ export const RegisterPage = () => {
         {/* Registration Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
+          <div>
+              <input
+                id="cust_name"
+                name="cust_name"
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Full Name"
+                value={formData.cust_name}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <input
+                id="cust_address"
+                name="cust_address"
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Address"
+                value={formData.cust_address}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <input
+                id="cust_contact"
+                name="cust_contact"
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Contact Number"
+                value={formData.cust_contact}
+                onChange={handleChange}
+              />
+            </div>
             <div>
               <input
                 id="email"
